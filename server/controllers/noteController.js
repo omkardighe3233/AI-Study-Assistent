@@ -2,7 +2,7 @@ import Note from '../models/Note.js';
 
 export const getNotes = async (req, res) => {
   try {
-    const notes = await Note.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    const notes = await Note.find({ userId: req.user._id }).sort({ isPinned: -1, createdAt: -1 });
     res.json(notes);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -25,7 +25,7 @@ export const createNote = async (req, res) => {
 
 export const updateNote = async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, isPinned, highlights } = req.body;
     let note = await Note.findById(req.params.id);
 
     if (!note) {
@@ -35,9 +35,30 @@ export const updateNote = async (req, res) => {
       return res.status(401).json({ message: 'Not authorized to update this note' });
     }
 
-    note.title = title || note.title;
-    note.content = content || note.content;
+    if (title !== undefined) note.title = title;
+    if (content !== undefined) note.content = content;
+    if (isPinned !== undefined) note.isPinned = isPinned;
+    if (highlights !== undefined) note.highlights = highlights;
 
+    const updatedNote = await note.save();
+    res.json(updatedNote);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const togglePinNote = async (req, res) => {
+  try {
+    let note = await Note.findById(req.params.id);
+
+    if (!note) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
+    if (note.userId.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    note.isPinned = !note.isPinned;
     const updatedNote = await note.save();
     res.json(updatedNote);
   } catch (error) {

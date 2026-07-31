@@ -12,6 +12,7 @@ import noteRoutes from './routes/noteRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import pdfRoutes from './routes/pdfRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/notes', noteRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/pdfs', pdfRoutes);
 app.use('/api/quizzes', quizRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Root route
 app.get('/', (req, res) => {

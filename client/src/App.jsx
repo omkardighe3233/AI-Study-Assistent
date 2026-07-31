@@ -8,6 +8,8 @@ import PDFs from './pages/PDFs';
 import Quiz from './pages/Quiz';
 import Notes from './pages/Notes';
 import Tasks from './pages/Tasks';
+import Chat from './pages/Chat';
+import PDFSummary from './pages/PDFSummary';
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -20,7 +22,9 @@ function App() {
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/chat" element={user ? <Chat /> : <Navigate to="/login" />} />
           <Route path="/pdfs" element={user ? <PDFs /> : <Navigate to="/login" />} />
+          <Route path="/pdfs/:id/summary" element={user ? <PDFSummary /> : <Navigate to="/login" />} />
           <Route path="/quizzes/:id" element={user ? <Quiz /> : <Navigate to="/login" />} />
           <Route path="/notes" element={user ? <Notes /> : <Navigate to="/login" />} />
           <Route path="/tasks" element={user ? <Tasks /> : <Navigate to="/login" />} />

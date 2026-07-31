@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, Trash2, Brain, X, Maximize2 } from 'lucide-react';
+import { Upload, FileText, Trash2, Brain, X, Maximize2, ExternalLink, Sparkles, ArrowLeft, Moon, Sun } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const PDFs = () => {
@@ -11,11 +11,19 @@ const PDFs = () => {
   const [uploading, setUploading] = useState(false);
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
   const [selectedSummaryPdf, setSelectedSummaryPdf] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
+
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchPdfs();
   }, []);
+
+  const toggleDarkMode = () => {
+    const nextTheme = !isDarkMode;
+    setIsDarkMode(nextTheme);
+    localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
+  };
 
   const fetchPdfs = async () => {
     try {
@@ -42,13 +50,13 @@ const PDFs = () => {
     formData.append('title', file.name);
 
     setUploading(true);
-    const loadingToast = toast.loading('Uploading & Generating AI Summary...');
+    const loadingToast = toast.loading('Uploading & Generating AI Detailed Summary...');
 
     try {
       await api.post('/pdfs', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      toast.success('Upload successful!', { id: loadingToast });
+      toast.success('Upload & Detailed Summary complete!', { id: loadingToast });
       setFile(null);
       fetchPdfs();
     } catch (error) {
@@ -71,7 +79,7 @@ const PDFs = () => {
 
   const generateQuiz = async (pdfId) => {
     setGeneratingQuiz(true);
-    const loadingToast = toast.loading('Generating Quiz using AI...');
+    const loadingToast = toast.loading('Generating Topic Quiz using AI...');
     try {
       const { data } = await api.post('/quizzes', { pdfId });
       toast.success('Quiz generated!', { id: loadingToast });
@@ -85,152 +93,175 @@ const PDFs = () => {
 
   const getViewUrl = (url) => {
     if (!url) return '#';
-    return url.endsWith('.pdf') ? url : `${url}.pdf`;
+    return url;
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen bg-gray-50/50">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Study Materials</h1>
-          <p className="text-sm text-gray-500 mt-1">Upload PDFs and let AI summarize them for you.</p>
-        </div>
-        <button onClick={() => navigate('/dashboard')} className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
-          &larr; Back to Dashboard
-        </button>
-      </div>
-
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload New PDF</h3>
-        <form onSubmit={handleUpload} className="flex flex-col sm:flex-row items-center gap-4">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 transition-colors"
-          />
-          <button
-            type="submit"
-            disabled={uploading}
-            className="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            <Upload size={18} />
-            {uploading ? 'Processing...' : 'Upload'}
-          </button>
-        </form>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {pdfs.map((pdf) => (
-          <motion.div
-            key={pdf._id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col"
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3 overflow-hidden">
-                <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
-                  <FileText size={20} />
-                </div>
-                <h4 className="font-semibold text-gray-900 truncate" title={pdf.title}>{pdf.title}</h4>
-              </div>
-              <button onClick={() => handleDelete(pdf._id)} className="text-gray-400 hover:text-red-500 transition-colors shrink-0">
-                <Trash2 size={18} />
-              </button>
+    <div className={`min-h-screen font-sans transition-colors duration-300 ${
+      isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50/70 text-slate-900'
+    }`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 p-6 rounded-3xl border shadow-sm backdrop-blur-xl transition-colors ${
+          isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200/80'
+        }`}>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                Study Hub
+              </span>
             </div>
-            
-            <div className="flex-grow">
-              <h5 className="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-2">AI Summary</h5>
-              <button 
-                onClick={() => setSelectedSummaryPdf(pdf)}
-                className="w-full text-left bg-gray-50 p-4 rounded-xl border border-gray-100 hover:bg-indigo-50 hover:border-indigo-100 transition-all group"
-              >
-                <p className="text-sm text-gray-600 line-clamp-3 mb-2">{pdf.summary || 'No summary available.'}</p>
-                <div className="flex items-center text-xs font-bold text-indigo-600 opacity-80 group-hover:opacity-100">
-                  <Maximize2 size={14} className="mr-1" /> Read Full Summary
-                </div>
-              </button>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-gray-100 flex gap-3">
-              <a 
-                href={getViewUrl(pdf.cloudinaryUrl)} 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex-1 px-4 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-100 transition-colors text-center"
-              >
-                View PDF
-              </a>
-              <button 
-                onClick={() => generateQuiz(pdf._id)}
-                disabled={generatingQuiz}
-                className="flex-1 px-4 py-2 bg-emerald-50 text-emerald-600 text-sm font-medium rounded-xl hover:bg-emerald-100 transition-colors text-center flex items-center justify-center gap-2"
-              >
-                <Brain size={16} /> Quiz
-              </button>
-            </div>
-          </motion.div>
-        ))}
-        {pdfs.length === 0 && !uploading && (
-          <div className="col-span-full text-center py-12 text-gray-500 bg-white rounded-2xl border border-gray-100 border-dashed">
-            No PDFs uploaded yet. Upload one above to get started!
+            <h1 className="text-2xl font-black mt-1">Study Materials & PDF Summarizer</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Upload PDF documents to generate detailed study guides & topic quizzes.</p>
           </div>
-        )}
-      </div>
-
-      {/* Summary Modal */}
-      <AnimatePresence>
-        {selectedSummaryPdf && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-white rounded-3xl shadow-2xl border border-gray-100 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden"
+          
+          <div className="flex items-center space-x-3 self-start sm:self-auto">
+            {/* Dark Mode Theme Switcher */}
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2.5 rounded-2xl border transition-all ${
+                isDarkMode
+                  ? 'bg-slate-800 border-slate-700 text-amber-400 hover:bg-slate-700'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+              }`}
+              title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
-                    <FileText size={18} />
+              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            <button 
+              onClick={() => navigate('/dashboard')} 
+              className={`px-4 py-2 text-xs font-bold rounded-2xl transition-colors flex items-center space-x-1.5 ${
+                isDarkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Dashboard</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Upload Dropzone Card */}
+        <div className={`p-6 sm:p-8 rounded-3xl shadow-sm border mb-8 transition-colors ${
+          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/80'
+        }`}>
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-2xl">
+              <Upload size={20} />
+            </div>
+            <div>
+              <h3 className="text-base font-bold">Upload New PDF Document</h3>
+              <p className="text-xs text-slate-400">Supported format: PDF (up to 20MB)</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleUpload} className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="relative flex-1 w-full">
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileChange}
+                className={`block w-full text-xs file:mr-4 file:py-3 file:px-5 file:rounded-2xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 dark:file:bg-indigo-950/60 file:text-indigo-600 dark:file:text-indigo-300 hover:file:bg-indigo-100 transition-all cursor-pointer border rounded-2xl p-1 ${
+                  isDarkMode ? 'border-slate-800 bg-slate-950 text-slate-400' : 'border-slate-200/70 bg-slate-50/50 text-slate-500'
+                }`}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={uploading}
+              className="w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-2xl transition-all shadow-md shadow-indigo-200 dark:shadow-none disabled:opacity-50 flex items-center justify-center space-x-2 shrink-0 active:scale-95"
+            >
+              <Sparkles size={16} />
+              <span>{uploading ? 'Analyzing PDF...' : 'Upload & Summarize'}</span>
+            </button>
+          </form>
+        </div>
+
+        {/* PDF Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {pdfs.map((pdf) => (
+            <motion.div
+              key={pdf._id}
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ y: -4 }}
+              className={`rounded-3xl p-6 shadow-sm border flex flex-col justify-between hover:shadow-md transition-all group ${
+                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/80'
+              }`}
+            >
+              <div>
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center space-x-3 overflow-hidden">
+                    <div className="p-3 bg-red-50 dark:bg-red-950/60 text-red-500 rounded-2xl shrink-0 group-hover:scale-105 transition-transform">
+                      <FileText size={22} />
+                    </div>
+                    <h4 className="font-bold text-sm truncate" title={pdf.title}>{pdf.title}</h4>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 truncate pr-4">
-                    {selectedSummaryPdf.title}
-                  </h3>
+                  <button 
+                    onClick={() => handleDelete(pdf._id)} 
+                    className="text-slate-400 hover:text-red-500 p-1 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/60 transition-colors shrink-0"
+                    title="Delete PDF"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => setSelectedSummaryPdf(null)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="p-8 overflow-y-auto custom-scrollbar">
-                <div className="prose prose-sm sm:prose-base prose-indigo max-w-none text-gray-700 whitespace-pre-wrap">
-                  {selectedSummaryPdf.summary || 'No summary available for this document.'}
+                
+                <div className="flex-grow mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <h5 className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">AI Detailed Brief</h5>
+                    <span className="text-[10px] text-slate-400 font-medium">Ready</span>
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/pdfs/${pdf._id}/summary`)}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all group/sum text-xs ${
+                      isDarkMode
+                        ? 'bg-slate-950/80 border-slate-800 hover:bg-indigo-950/30 hover:border-indigo-900/50'
+                        : 'bg-slate-50/80 border-slate-100 hover:bg-indigo-50/60 hover:border-indigo-100'
+                    }`}
+                  >
+                    <p className="text-slate-400 line-clamp-3 mb-2 leading-relaxed">{pdf.summary || 'No summary available.'}</p>
+                    <div className="flex items-center text-xs font-extrabold text-indigo-600 dark:text-indigo-400 group-hover/sum:translate-x-1 transition-transform">
+                      <Maximize2 size={13} className="mr-1.5" /> Open Full Page Summary &rarr;
+                    </div>
+                  </button>
                 </div>
               </div>
-              <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
-                <button 
-                  onClick={() => setSelectedSummaryPdf(null)}
-                  className="px-6 py-2.5 bg-gray-200 text-gray-800 font-medium rounded-xl hover:bg-gray-300 transition-colors"
+
+              <div className={`pt-4 border-t flex gap-2.5 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+                <a 
+                  href={getViewUrl(pdf.cloudinaryUrl)} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className={`flex-1 py-2.5 text-xs font-bold rounded-2xl transition-colors text-center flex items-center justify-center space-x-1.5 ${
+                    isDarkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
                 >
-                  Close
-                </button>
+                  <ExternalLink size={14} />
+                  <span>View PDF</span>
+                </a>
                 <button 
-                  onClick={() => {
-                    generateQuiz(selectedSummaryPdf._id);
-                    setSelectedSummaryPdf(null);
-                  }}
-                  className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                  onClick={() => generateQuiz(pdf._id)}
+                  disabled={generatingQuiz}
+                  className="flex-1 py-2.5 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-2xl hover:bg-emerald-100 transition-colors text-center flex items-center justify-center space-x-1.5"
                 >
-                  <Brain size={18} /> Generate Quiz
+                  <Brain size={15} />
+                  <span>Generate Quiz</span>
                 </button>
               </div>
             </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+          ))}
+
+          {pdfs.length === 0 && !uploading && (
+            <div className={`col-span-full text-center py-16 rounded-3xl border border-dashed ${
+              isDarkMode ? 'bg-slate-900/60 border-slate-800 text-slate-500' : 'bg-white border-slate-200 text-slate-400'
+            }`}>
+              <FileText size={40} className="mx-auto mb-3 text-slate-400" />
+              <p className="text-sm font-semibold text-slate-400">No PDFs uploaded yet</p>
+              <p className="text-xs text-slate-500 mt-1">Upload a PDF document above to get started with AI summaries and quizzes!</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

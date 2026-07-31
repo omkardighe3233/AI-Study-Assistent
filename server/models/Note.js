@@ -10,6 +10,16 @@ const noteSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please add content'],
     },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
+    highlights: [
+      {
+        text: String,
+        color: String,
+      },
+    ],
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

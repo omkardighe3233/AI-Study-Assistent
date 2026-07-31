@@ -13,6 +13,15 @@ const pdfSchema = new mongoose.Schema(
     summary: {
       type: String,
     },
+    pdfText: {
+      type: String,
+    },
+    highlights: [
+      {
+        text: String,
+        color: String,
+      },
+    ],
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
