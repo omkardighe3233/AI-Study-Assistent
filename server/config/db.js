@@ -4,7 +4,8 @@ import dns from 'dns';
 const connectDB = async () => {
   const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/ai_study_assistant';
   try {
-    if (uri.startsWith('mongodb+srv://')) {
+    // On Windows development, custom DNS can help resolve SRV records; on Linux (Render), native DNS resolver is used.
+    if (process.platform === 'win32' && uri.startsWith('mongodb+srv://')) {
       try {
         dns.setServers(['8.8.8.8', '1.1.1.1']);
       } catch (dnsErr) {
