@@ -1,5 +1,12 @@
 node_modules/
 .env
+.env.*
+.env.local
+server/.env
+client/.env
+!.env.example
+!server/.env.example
 dist/
 build/
 .DS_Store
+*.log

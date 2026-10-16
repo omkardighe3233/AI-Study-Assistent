@@ -47,12 +47,34 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 ```
 
-### Running the App
+### Running the App Locally
+
+#### Using Root Scripts:
+```bash
+# Install all dependencies (client and server)
+npm run install:all
+
+# Start backend (dev mode)
+npm run server
+
+# Start frontend (dev mode)
+npm run client
+```
+
+#### Running Separately:
 1. Start the server (from the `server` directory):
    ```bash
-   npm start
+   npm run dev
    ```
 2. Start the client (from the `client` directory):
    ```bash
    npm run dev
    ```
+
+## Deployment on Render
+
+This project is fully prepared for one-click deployment on Render:
+- Full documentation: see [DEPLOYMENT.md](file:///c:/Users/omkar/Desktop/Major%20proj/AI-Study-Assistent/DEPLOYMENT.md)
+- Blueprint specification: [render.yaml](file:///c:/Users/omkar/Desktop/Major%20proj/AI-Study-Assistent/render.yaml)
+- Build command: `npm run build`
+- Start command: `npm start`
